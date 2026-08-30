@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b1vj5r2lhat2f"]
+
+[ext_resource type="Script" uid="uid://udmfcnlx00bw" path="res://stayfocussed.gd" id="1_lc3ud"]
+
+[node name="stayfocussed" type="Node2D" unique_id=180916092]
+script = ExtResource("1_lc3ud")
