@@ -1,70 +1,127 @@
-def calculate_performance(accuracy, reaction_time, mistakes):
+def calculate_performance(
+    score,
+    accuracy,
+    avg_reaction_time,
+    best_streak
+):
     """
-    Calculate overall performance score out of 100.
+    Calculate a performance score out of 100.
 
-    accuracy: value between 0 and 1
-               Example: 0.85 = 85%
-    reaction_time: time taken in seconds
-    mistakes: number of mistakes
+    accuracy:
+        0 to 100
+
+    score:
+        Game score
+
+    avg_reaction_time:
+        Average time in seconds
+
+    best_streak:
+        Longest correct-answer streak
     """
 
-    # Accuracy contributes up to 60 points
-    accuracy_score = accuracy * 60
+    # --------------------------------
+    # SCORE COMPONENT
+    # --------------------------------
 
-    # Reaction time contributes up to 25 points
-    if reaction_time <= 3:
-        reaction_score = 25
-    elif reaction_time <= 6:
-        reaction_score = 15
-    else:
-        reaction_score = 5
+    # Current game has 20 rounds
+    # and gives 10 points for each
+    # correct answer.
+    max_score = 200
 
-    # Mistakes contribute up to 15 points
-    if mistakes == 0:
-        mistake_score = 15
-    elif mistakes <= 2:
-        mistake_score = 10
-    else:
-        mistake_score = 5
-
-    total_score = (
-        accuracy_score
-        + reaction_score
-        + mistake_score
+    score_percentage = (
+        min(score / max_score, 1.0) * 100
     )
 
-    return round(total_score, 2)
+    # --------------------------------
+    # ACCURACY COMPONENT
+    # --------------------------------
 
+    accuracy_score = accuracy
 
-def choose_difficulty(score, current_difficulty):
-    """
-    Decide the difficulty for the next round.
+    # --------------------------------
+    # REACTION TIME COMPONENT
+    # --------------------------------
 
-    Difficulty ranges from 1 to 5.
-    """
+    if avg_reaction_time <= 2:
+        reaction_score = 100
 
-    if score >= 80:
-        return min(current_difficulty + 1, 5)
+    elif avg_reaction_time <= 3:
+        reaction_score = 90
 
-    elif score >= 60:
-        return current_difficulty
+    elif avg_reaction_time <= 4:
+        reaction_score = 80
+
+    elif avg_reaction_time <= 5:
+        reaction_score = 70
+
+    elif avg_reaction_time <= 6:
+        reaction_score = 60
 
     else:
-        return max(current_difficulty - 1, 1)
+        reaction_score = 40
+
+    # --------------------------------
+    # STREAK COMPONENT
+    # --------------------------------
+
+    streak_score = min(
+        (best_streak / 10) * 100,
+        100
+    )
+
+    # --------------------------------
+    # FINAL PERFORMANCE
+    # --------------------------------
+
+    performance = (
+        score_percentage * 0.20
+        + accuracy_score * 0.40
+        + reaction_score * 0.25
+        + streak_score * 0.15
+    )
+
+    return round(performance, 2)
 
 
-def analyze_history(scores):
+def choose_difficulty(
+    performance,
+    current_difficulty
+):
     """
-    Analyze recent performance.
+    Choose the next difficulty level.
 
-    scores should contain performance scores.
+    Difficulty ranges from 1 to 4
+    for the current What Changed? game.
     """
 
-    if len(scores) < 2:
+    if performance >= 80:
+        return min(
+            current_difficulty + 1,
+            4
+        )
+
+    elif performance < 55:
+        return max(
+            current_difficulty - 1,
+            1
+        )
+
+    else:
+        return current_difficulty
+
+
+def analyze_history(history):
+    """
+    Analyze the player's recent
+    performance trend.
+    """
+
+    if len(history) < 2:
         return "Not enough data"
 
-    previous = scores[-2]
-    current = scores[-1]
+    previous = history[-2]
+    current = history[-1]
 
     if current > previous + 5:
         return "Improving"
@@ -76,100 +133,36 @@ def analyze_history(scores):
         return "Stable"
 
 
-def create_cognitive_profile(
-    memory,
-    attention,
-    reaction,
-    pattern
-):
-    """
-    Create a cognitive performance profile.
-    """
-
-    profile = {
-        "Memory": memory,
-        "Attention": attention,
-        "Reaction": reaction,
-        "Pattern Recognition": pattern
-    }
-
-    overall = (
-        memory
-        + attention
-        + reaction
-        + pattern
-    ) / 4
-
-    return profile, round(overall, 2)
-
-
-def recommend_activity(profile):
-    """
-    Find the weakest cognitive area
-    and recommend a suitable activity.
-    """
-
-    weakest_skill = min(
-        profile,
-        key=profile.get
-    )
-
-    recommendations = {
-        "Memory":
-            "Practice visual memory games",
-
-        "Attention":
-            "Practice attention and focus games",
-
-        "Reaction":
-            "Practice reaction-speed games",
-
-        "Pattern Recognition":
-            "Practice pattern recognition games"
-    }
-
-    return (
-        weakest_skill,
-        recommendations[weakest_skill]
-    )
-
-
 def get_difficulty_settings(level):
     """
-    Return the settings for each
-    What Changed? difficulty level.
+    Settings for the current
+    What Changed? game.
     """
 
     levels = {
 
         1: {
             "objects": 4,
-            "observation_time": 20,
-            "changes": 1
+            "memorize_time": 3,
+            "change_types": 1
         },
 
         2: {
             "objects": 6,
-            "observation_time": 17,
-            "changes": 1
+            "memorize_time": 3,
+            "change_types": 1
         },
 
         3: {
-            "objects": 8,
-            "observation_time": 14,
-            "changes": 2
+            "objects": 6,
+            "memorize_time": 2,
+            "change_types": 1
         },
 
         4: {
-            "objects": 10,
-            "observation_time": 10,
-            "changes": 3
-        },
-
-        5: {
-            "objects": 12,
-            "observation_time": 7,
-            "changes": 4
+            "objects": 9,
+            "memorize_time": 4,
+            "change_types": 2
         }
     }
 
@@ -177,45 +170,49 @@ def get_difficulty_settings(level):
 
 
 def process_game_result(
+    score,
     accuracy,
-    reaction_time,
-    mistakes,
+    avg_reaction_time,
+    best_streak,
     current_difficulty,
     history
 ):
     """
-    Process one completed game.
+    Main adaptive AI function.
 
-    Takes the player's game performance
-    and decides what should happen next.
+    Receives results from the Godot game
+    and decides the next difficulty.
     """
 
-    # Step 1: Calculate performance
+    # Calculate performance
     performance = calculate_performance(
+        score,
         accuracy,
-        reaction_time,
-        mistakes
+        avg_reaction_time,
+        best_streak
     )
 
-    # Step 2: Decide next difficulty
+    # Decide next difficulty
     next_difficulty = choose_difficulty(
         performance,
         current_difficulty
     )
 
-    # Step 3: Analyze performance trend
-    updated_history = history + [performance]
+    # Update history
+    updated_history = history + [
+        performance
+    ]
 
+    # Analyze trend
     trend = analyze_history(
         updated_history
     )
 
-    # Step 4: Get settings for next level
+    # Get settings for next game
     settings = get_difficulty_settings(
         next_difficulty
     )
 
-    # Step 5: Return everything
     return {
         "performance": performance,
         "next_difficulty": next_difficulty,
@@ -229,93 +226,79 @@ def process_game_result(
 # ==================================================
 
 print("===================================")
-print("      ADAPTIVE ENGINE TEST")
+print("       ADAPTIVE ENGINE TEST")
 print("===================================")
 
 
-# ----------------------------------
-# Test 1: Performance History
-# ----------------------------------
+# Example result from Godot
 
-scores = [60, 65, 72, 82]
+score = 160
+accuracy = 80
+avg_reaction_time = 3.2
+best_streak = 6
 
-trend = analyze_history(scores)
+current_difficulty = 2
 
-print("\nPerformance History:")
-print(scores)
+history = [
+    62,
+    68,
+    74
+]
 
-print("Performance Trend:")
-print(trend)
-
-
-# ----------------------------------
-# Test 2: Cognitive Profile
-# ----------------------------------
-
-profile, overall = create_cognitive_profile(
-    memory=80,
-    attention=65,
-    reaction=90,
-    pattern=70
-)
-
-print("\nCognitive Profile:")
-
-for skill, score in profile.items():
-    print(skill + ":", score)
-
-print("Overall Score:", overall)
-
-
-# ----------------------------------
-# Test 3: Recommendation
-# ----------------------------------
-
-weakest, recommendation = recommend_activity(
-    profile
-)
-
-print("\nArea needing more practice:")
-print(weakest)
-
-print("Recommendation:")
-print(recommendation)
-
-
-# ----------------------------------
-# Test 4: Game Result
-# ----------------------------------
 
 result = process_game_result(
-    accuracy=0.85,
-    reaction_time=3.2,
-    mistakes=1,
-    current_difficulty=2,
-    history=[65, 72, 78]
+    score,
+    accuracy,
+    avg_reaction_time,
+    best_streak,
+    current_difficulty,
+    history
 )
 
-print("\nGame Result Analysis:")
 
-print("Performance:",
-      result["performance"])
+print("\nGame Results:")
+print("Score:", score)
+print("Accuracy:", accuracy, "%")
+print(
+    "Average Reaction Time:",
+    avg_reaction_time,
+    "seconds"
+)
+print("Best Streak:", best_streak)
 
-print("Next Difficulty:",
-      result["next_difficulty"])
+print("\nAI Analysis:")
+print(
+    "Performance:",
+    result["performance"]
+)
 
-print("Trend:",
-      result["trend"])
+print(
+    "Next Difficulty:",
+    result["next_difficulty"]
+)
 
-print("Next Game Settings:")
-print("Objects:",
-      result["settings"]["objects"])
+print(
+    "Trend:",
+    result["trend"]
+)
 
-print("Observation Time:",
-      result["settings"]["observation_time"],
-      "seconds")
+print("\nNext Game Settings:")
 
-print("Number of Changes:",
-      result["settings"]["changes"])
+print(
+    "Objects:",
+    result["settings"]["objects"]
+)
 
+print(
+    "Memorize Time:",
+    result["settings"]["memorize_time"],
+    "seconds"
+)
+
+print(
+    "Change Types:",
+    result["settings"]["change_types"]
+)
 
 print("\n===================================")
 print("          TEST COMPLETE")
