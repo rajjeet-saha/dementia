@@ -9,7 +9,7 @@ import { CaregiverLogin } from './pages/caregiver/CaregiverLogin';
 import { CaregiverDashboard } from './pages/caregiver/CaregiverDashboard';
 import { PatientDetailView } from './pages/caregiver/PatientDetailView';
 
-// Helper component to handle section navigation for path aliases like /games, /adaptive-ai, /problem
+// Helper component to handle section navigation for path aliases
 const SectionRouteWrapper: React.FC<{ sectionId: string }> = ({ sectionId }) => {
   useEffect(() => {
     const el = document.getElementById(sectionId);
@@ -24,7 +24,7 @@ const SectionRouteWrapper: React.FC<{ sectionId: string }> = ({ sectionId }) => 
 // Layout for public presentation pages
 const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-teal-100 selection:text-teal-900">
+    <div className="min-h-screen flex flex-col bg-[#faf8f5] text-slate-800 font-sans selection:bg-orange-100 selection:text-orange-950">
       <Navbar />
       <div className="flex-1 w-full">
         {children}
@@ -42,12 +42,17 @@ export const App: React.FC = () => {
           <Routes>
             {/* Public Website Routes */}
             <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
-            <Route path="/problem" element={<PublicLayout><SectionRouteWrapper sectionId="problem" /></PublicLayout>} />
-            <Route path="/solution" element={<PublicLayout><SectionRouteWrapper sectionId="solution" /></PublicLayout>} />
+            <Route path="/how-it-works" element={<PublicLayout><SectionRouteWrapper sectionId="how-it-works" /></PublicLayout>} />
             <Route path="/features" element={<PublicLayout><SectionRouteWrapper sectionId="features" /></PublicLayout>} />
-            <Route path="/games" element={<PublicLayout><SectionRouteWrapper sectionId="games" /></PublicLayout>} />
-            <Route path="/adaptive-ai" element={<PublicLayout><SectionRouteWrapper sectionId="adaptive-ai" /></PublicLayout>} />
+            <Route path="/north-east" element={<PublicLayout><SectionRouteWrapper sectionId="north-east" /></PublicLayout>} />
+            <Route path="/caregivers" element={<PublicLayout><SectionRouteWrapper sectionId="caregivers" /></PublicLayout>} />
             <Route path="/download" element={<PublicLayout><SectionRouteWrapper sectionId="download" /></PublicLayout>} />
+
+            {/* Backwards compatible path aliases */}
+            <Route path="/problem" element={<PublicLayout><SectionRouteWrapper sectionId="north-east" /></PublicLayout>} />
+            <Route path="/solution" element={<PublicLayout><SectionRouteWrapper sectionId="features" /></PublicLayout>} />
+            <Route path="/games" element={<PublicLayout><SectionRouteWrapper sectionId="features" /></PublicLayout>} />
+            <Route path="/adaptive-ai" element={<PublicLayout><SectionRouteWrapper sectionId="features" /></PublicLayout>} />
 
             {/* Private Caregiver Portal Routes (Supabase Auth & Database) */}
             <Route path="/caregiver/login" element={<CaregiverLogin />} />

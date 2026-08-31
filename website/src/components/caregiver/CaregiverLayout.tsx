@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  Brain, 
   UserCheck, 
   LogOut, 
   ArrowLeft, 
@@ -43,22 +42,22 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
   const isPatientDetail = location.pathname.includes('/caregiver/patient/');
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans text-slate-900">
-      {/* Top Clinical Header Bar */}
-      <header className="bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
+    <div className="min-h-screen bg-[#faf8f5] flex flex-col font-sans text-slate-800">
+      {/* Top Header Bar */}
+      <header className="bg-[#1e293b] text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo & Portal Identification */}
             <div className="flex items-center gap-3">
-              <Link to="/" className="flex items-center gap-2.5 text-teal-400 hover:text-teal-300 transition">
-                <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center text-white font-bold shadow-xs">
-                  <Brain className="w-5 h-5" />
+              <Link to="/" className="flex items-center gap-2.5 text-amber-400 hover:text-amber-300 transition">
+                <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-xs">
+                  R
                 </div>
                 <div>
                   <span className="font-extrabold tracking-tight text-white font-sans text-base">
-                    DEMENTIA
+                    REDLER
                   </span>
-                  <span className="text-[10px] text-teal-300 font-mono block -mt-1">
+                  <span className="text-[10px] text-amber-300 font-mono block -mt-1">
                     Caregiver Portal
                   </span>
                 </div>
@@ -70,18 +69,18 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
               {isSupabaseConfigured && !isDemoMode ? (
                 <span className="hidden md:inline-flex items-center gap-1.5 bg-emerald-950 text-emerald-300 text-[11px] font-mono font-bold px-2.5 py-1 rounded-full border border-emerald-700">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Supabase Live Connection
+                  Supabase Live
                 </span>
               ) : (
                 <span className="hidden md:inline-flex items-center gap-1.5 bg-amber-950 text-amber-300 text-[11px] font-mono font-bold px-2.5 py-1 rounded-full border border-amber-700">
                   <Sparkles className="w-3 h-3 text-amber-400" />
-                  NER Caregiver Sandbox Mode
+                  Sandbox Mode
                 </span>
               )}
             </div>
 
             {/* Right Header Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               {/* Accessibility Toggles */}
               <button
                 onClick={toggleHighContrast}
@@ -97,7 +96,7 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
               <button
                 onClick={toggleVoiceAssistant}
                 className={`p-2 rounded-lg text-xs border transition ${
-                  voiceAssistant ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
+                  voiceAssistant ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
                 }`}
                 title="Toggle Voice Assistant"
                 aria-label="Toggle Voice Assistant"
@@ -111,21 +110,21 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
                   onClick={onRefresh}
                   disabled={isRefreshing}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition"
-                  title="Refresh Patient Telemetry"
+                  title="Refresh Partner Telemetry"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-teal-400' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-amber-400' : ''}`} />
                   <span className="hidden sm:inline">Refresh Data</span>
                 </button>
               )}
 
               {/* Caregiver Identity */}
               <div className="hidden lg:flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700">
-                <UserCheck className="w-4 h-4 text-teal-400" />
+                <UserCheck className="w-4 h-4 text-blue-400" />
                 <div className="text-left">
                   <p className="text-xs font-bold text-white leading-tight">
                     {profile?.name || user?.email || 'Authorized Caregiver'}
                   </p>
-                  <p className="text-[10px] text-teal-300 capitalize font-mono">
+                  <p className="text-[10px] text-slate-300 capitalize font-mono">
                     Role: {profile?.role || 'caregiver'}
                   </p>
                 </div>
@@ -135,7 +134,7 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
               <button
                 onClick={handleSignOut}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-950/80 hover:bg-rose-900 text-rose-200 text-xs font-bold border border-rose-800 transition"
-                title="Secure Sign Out"
+                title="Sign Out"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Sign Out</span>
@@ -146,16 +145,16 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
       </header>
 
       {/* Breadcrumb / Sub-header */}
-      <div className="bg-white border-b border-slate-200/80 shadow-xs">
+      <div className="bg-white border-b border-stone-200/80 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             {isPatientDetail && (
               <Link
                 to="/caregiver/dashboard"
-                className="p-2 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-800 border border-slate-200 transition flex items-center gap-1 text-xs font-bold"
+                className="p-2 rounded-xl bg-stone-100 hover:bg-blue-50 text-slate-700 hover:text-blue-900 border border-stone-200 transition flex items-center gap-1 text-xs font-bold"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>All Patients</span>
+                <span>All Partners</span>
               </Link>
             )}
 
@@ -174,7 +173,7 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
           <div className="flex items-center gap-2">
             <Link
               to="/"
-              className="text-xs font-semibold text-teal-800 hover:text-teal-900 bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200 transition"
+              className="text-xs font-semibold text-[#1e3a8a] hover:text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 transition"
             >
               ← Public Website
             </Link>
@@ -187,11 +186,11 @@ export const CaregiverLayout: React.FC<CaregiverLayoutProps> = ({
         {children}
       </main>
 
-      {/* Clinical Footer */}
-      <footer className="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 font-mono">
+      {/* Footer */}
+      <footer className="bg-white border-t border-stone-200 py-4 text-center text-xs text-slate-500 font-mono">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>DEMENTIA Caregiver Telemetry Subsystem • Supabase PostgreSQL Schema</span>
-          <span>Row Level Security (RLS) Compliant Patient Isolation</span>
+          <span>REDLER Caregiver Telemetry Subsystem • Supabase PostgreSQL Schema</span>
+          <span>Row Level Security (RLS) Compliant Partner Isolation</span>
         </div>
       </footer>
     </div>

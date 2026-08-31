@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
-  Brain, 
   Lock, 
   Mail, 
   ArrowRight, 
@@ -44,30 +43,30 @@ export const CaregiverLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans text-slate-100 relative overflow-hidden">
+    <div className="min-h-screen bg-[#1e293b] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans text-slate-100 relative overflow-hidden">
       {/* Background Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10">
         <Link to="/" className="inline-flex items-center gap-3 group">
-          <div className="w-12 h-12 rounded-2xl bg-teal-600 flex items-center justify-center text-white font-bold shadow-lg shadow-teal-600/30 group-hover:scale-105 transition">
-            <Brain className="w-7 h-7" />
+          <div className="w-11 h-11 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-900/30 group-hover:scale-105 transition">
+            R
           </div>
           <span className="text-3xl font-extrabold tracking-tight text-white font-sans">
-            DEMENTIA
+            REDLER
           </span>
         </Link>
         
-        <h2 className="mt-4 text-2xl font-bold text-white tracking-tight">
-          Caregiver & Clinical Portal
+        <h2 className="mt-3 text-2xl font-bold text-white tracking-tight">
+          Caregiver Portal
         </h2>
         <p className="mt-1 text-xs text-slate-400">
-          Secure access for authorized family caregivers and healthcare workers.
+          Secure access for authorized family caregivers and health workers.
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4">
-        <div className="bg-slate-800/90 backdrop-blur-md py-8 px-6 sm:px-10 shadow-2xl rounded-3xl border border-slate-700">
+        <div className="bg-slate-800/90 backdrop-blur-md py-8 px-6 sm:px-10 shadow-xl rounded-3xl border border-slate-700">
           {/* Error Alert */}
           {errorMessage && (
             <div className="mb-6 p-3.5 rounded-xl bg-rose-950/80 border border-rose-700 text-rose-200 text-xs flex items-start gap-2.5">
@@ -77,7 +76,7 @@ export const CaregiverLogin: React.FC = () => {
           )}
 
           {/* Login Form */}
-          <form className="space-y-5" onSubmit={handleLogin}>
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div>
               <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 font-mono">
                 Email Address
@@ -92,7 +91,7 @@ export const CaregiverLogin: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="caregiver@ner-health.org"
-                  className="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
+                  className="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm"
                 />
               </div>
             </div>
@@ -111,7 +110,7 @@ export const CaregiverLogin: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm"
+                  className="block w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm"
                 />
               </div>
             </div>
@@ -119,44 +118,44 @@ export const CaregiverLogin: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 shadow-lg shadow-teal-900/40 transition flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-teal-500/30"
+              className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-blue-500/30"
             >
               {isSubmitting ? (
                 <span>Authenticating...</span>
               ) : (
                 <>
                   <UserCheck className="w-4 h-4" />
-                  <span>Sign In with Supabase</span>
+                  <span>Sign In to Redler Portal</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Quick Demo Sandbox Access Button */}
-          <div className="mt-6 pt-6 border-t border-slate-700 space-y-3">
+          {/* Sandbox Access Button */}
+          <div className="mt-6 pt-5 border-t border-slate-700 space-y-3">
             <div className="flex items-center justify-between text-xs text-slate-400">
-              <span>Instant Review / Sandbox</span>
-              <span className="text-[10px] text-teal-400 font-mono">NER Clinical Profiles</span>
+              <span>Demo / Evaluation</span>
+              <span className="text-[10px] text-amber-300 font-mono">Preloaded Partners</span>
             </div>
 
             <button
               type="button"
               onClick={handleDemoLogin}
-              className="w-full py-3 px-4 rounded-xl text-xs font-bold text-amber-300 bg-amber-950/70 hover:bg-amber-900/80 border border-amber-600/80 transition flex items-center justify-center gap-2"
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-amber-200 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/60 transition flex items-center justify-center gap-2"
             >
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Enter Sandbox Mode (Preloaded Patients)</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Enter Sandbox Mode (Explore Data)</span>
             </button>
           </div>
 
-          {/* Architecture info */}
-          <div className="mt-6 pt-4 border-t border-slate-700/60 text-[11px] text-slate-400 flex items-center justify-between">
+          {/* Return link */}
+          <div className="mt-5 pt-3 border-t border-slate-700/60 text-[11px] text-slate-400 flex items-center justify-between">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
-              PostgreSQL RLS Protected
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+              PostgreSQL RLS
             </span>
-            <Link to="/" className="text-teal-400 hover:underline">
+            <Link to="/" className="text-amber-400 hover:underline">
               ← Return to Main Site
             </Link>
           </div>

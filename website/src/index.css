@@ -5,6 +5,7 @@
     --font-primary: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-accessible: 'Atkinson Hyperlegible', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+    --bg-cream: #faf8f5;
   }
 
   html {
@@ -12,6 +13,12 @@
     scroll-behavior: smooth;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    background-color: var(--bg-cream);
+  }
+
+  body {
+    background-color: var(--bg-cream);
+    color: #1e293b;
   }
 
   /* Accessibility Scaling */
@@ -41,34 +48,36 @@
     color: #ffffff !important;
   }
 
-  html.high-contrast .border-slate-200,
-  html.high-contrast .border-slate-100 {
-    border-color: #000000 !important;
-    border-width: 2px !important;
-  }
-
   /* Accessible Focus States */
   :focus-visible {
-    outline: 3px solid #0d9488 !important;
+    outline: 3px solid #1e3a8a !important;
     outline-offset: 2px !important;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 }
 
-/* Custom Scrollbar for Elderly-friendly accessibility */
+/* Subtle North-East geometric decorative pattern */
+.ne-pattern-subtle {
+  background-image: radial-gradient(#d97706 0.75px, transparent 0.75px), radial-gradient(#1e3a8a 0.75px, #faf8f5 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  opacity: 0.04;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f1ede6;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 5px;
+  background: #d6cebf;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #b8ad99;
 }
 
 @media (prefers-reduced-motion: reduce) {
