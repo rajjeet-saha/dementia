@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-primary: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-accessible: 'Atkinson Hyperlegible', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html {
+    font-family: var(--font-primary);
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Accessibility Scaling */
+  html.font-scale-normal {
+    font-size: 16px;
+  }
+  html.font-scale-large {
+    font-size: 18px;
+  }
+  html.font-scale-xl {
+    font-size: 20px;
+  }
+
+  /* Accessible High Contrast Mode */
+  html.high-contrast {
+    filter: contrast(1.25);
+  }
+  
+  html.high-contrast body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  html.high-contrast .bg-slate-900,
+  html.high-contrast .bg-slate-800 {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  html.high-contrast .border-slate-200,
+  html.high-contrast .border-slate-100 {
+    border-color: #000000 !important;
+    border-width: 2px !important;
+  }
+
+  /* Accessible Focus States */
+  :focus-visible {
+    outline: 3px solid #0d9488 !important;
+    outline-offset: 2px !important;
+    border-radius: 4px;
+  }
+}
+
+/* Custom Scrollbar for Elderly-friendly accessibility */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
