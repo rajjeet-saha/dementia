@@ -14,6 +14,15 @@ class AccessibilityController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void changeLocale(String languageCode) {
+    if (_locale.languageCode != languageCode) {
+      _locale = Locale(languageCode, '');
+      notifyListeners();
+      // Note: In a full production app, you would also save this to SQLite
+      // or SharedPreferences here so it remembers the choice on restart.
+    }
+  }
+
   void setLocale(Locale newLocale) {
     _locale = newLocale;
     notifyListeners();

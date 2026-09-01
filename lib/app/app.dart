@@ -19,11 +19,38 @@ class Redler extends StatelessWidget {
       listenable: accessibilityController,
       builder: (context, _) {
         return MaterialApp(
-          title: 'Sahayata NER',
+          title: 'Redler',
           debugShowCheckedModeBanner: false,
           theme: accessibilityController.isHighContrast
-              ? AppTheme.getHighContrastTheme()
-              : AppTheme.getStandardTheme(),
+          // 1. HIGH CONTRAST THEME (Activated when toggle is ON)
+              ? ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: Colors.black,
+            colorScheme: const ColorScheme.highContrastDark(
+              primary: Colors.yellowAccent,
+              secondary: Colors.cyanAccent,
+              surface: Colors.black,
+              onSurface: Colors.white,
+            ),
+          )
+          // 2. STANDARD CULTURAL THEME (Activated when toggle is OFF)
+              : ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: const Color(0xFFFAFAFA),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF3F51B5), // Ashoka Navy Blue base
+              primary: const Color(0xFF303F9F),
+              primaryContainer: const Color(0xFFE8EAF6),
+              secondary: const Color(0xFFFF9800), // Saffron
+              secondaryContainer: const Color(0xFFFFF3E0),
+              tertiary: const Color(0xFF4CAF50), // Green
+              tertiaryContainer: const Color(0xFFE8F5E9),
+              surface: const Color(0xFFFAFAFA), // Off-white
+              surfaceContainerHighest: const Color(0xFFF5F5F5),
+            ),
+          ),
           locale: accessibilityController.locale,
           supportedLocales: const [
             Locale('en', ''),

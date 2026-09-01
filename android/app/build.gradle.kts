@@ -42,4 +42,7 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+
+    // Target the EXACT file directly.
+    // (If your file is named differently, update the name inside the quotes!
 }

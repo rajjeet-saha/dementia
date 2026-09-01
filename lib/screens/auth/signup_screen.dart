@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../../accessibility/accessibility_controller.dart';
 import '../../localization/app_localizations.dart';
 import '../../repositories/auth_repository.dart';
-import '../../widgets/accessible_button.dart';
 import '../../widgets/accessible_text.dart';
+import '../../widgets/cultural_background.dart';
 import '../../app/routes.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -23,12 +23,13 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _authRepository = AuthRepository();
 
-  bool _isLoading = false;
-  String? _errorMessage;
   String _selectedRole = 'user';
   String _selectedLanguage = 'en';
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  final AuthRepository _authRepository = AuthRepository();
 
   final List<Map<String, String>> _languages = [
     {'code': 'en', 'name': 'English'},
@@ -51,11 +52,9 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _handleSignup() async {
-    if (_nameController.text.trim().isEmpty ||
-        _emailController.text.trim().isEmpty ||
-        _passwordController.text.isEmpty) {
+    if (_nameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
-        _errorMessage = AppLocalizations.of(context)!.translate('fill_all_fields');
+        _errorMessage = AppLocalizations.of(context)?.translate('fill_all_fields') ?? 'Please fill all required fields';
       });
       return;
     }
@@ -66,26 +65,21 @@ class _SignupScreenState extends State<SignupScreen> {
     });
 
     try {
-      final profile = await _authRepository.signUp(
-        name: _nameController.text.trim(),
+      final user = await _authRepository.signUp(
         email: _emailController.text.trim(),
-        password: _passwordController.text,
-        phoneNumber: _phoneController.text.trim(),
+        password: _passwordController.text.trim(),
+        name: _nameController.text.trim(),
         role: _selectedRole,
         preferredLanguage: _selectedLanguage,
+        phoneNumber: _phoneController.text.trim(),
       );
 
-      if (!mounted) return;
-
-      // Update the global language state
-      widget.accessibilityController.setLocale(Locale(_selectedLanguage));
-
-      _showSuccessDialog(profile.publicUserId, profile.role);
-
+      if (user != null && mounted) {
+        _showSuccessDialog(user.publicUserId);
+      }
     } catch (e) {
-      if (!mounted) return;
       setState(() {
-        _errorMessage = AppLocalizations.of(context)!.translate('signup_error');
+        _errorMessage = AppLocalizations.of(context)?.translate('signup_error') ?? 'Signup failed. Please try again.';
       });
     } finally {
       if (mounted) {
@@ -96,46 +90,51 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  void _showSuccessDialog(String publicId, String role) {
-    final loc = AppLocalizations.of(context)!;
+  void _showSuccessDialog(String publicUserId) {
+    final loc = AppLocalizations.of(context);
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFFFAFAFA),
         title: AccessibleText(
-          loc.translate('account_created'),
-          baseFontSize: 24,
+          loc?.translate('account_created') ?? 'Account Created!',
           fontWeight: FontWeight.bold,
+          color: const Color(0xFF138808), // Success Green
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AccessibleText(loc.translate('your_id_is')),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: SelectableText(
-                publicId,
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
-              ),
+            AccessibleText(loc?.translate('your_id_is') ?? 'Your unique ID is:'),
+            const SizedBox(height: 16),
+            SelectableText(
+              publicUserId,
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Color(0xFF303F9F)),
             ),
-            const SizedBox(height: 12),
-            AccessibleText(loc.translate('keep_id_safe')),
+            const SizedBox(height: 16),
+            AccessibleText(
+              loc?.translate('keep_id_safe') ?? 'Please keep this safe. Your Care Partner will need it.',
+              baseFontSize: 16,
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
         actions: [
-          AccessibleButton(
-            label: loc.translate('continue_button'),
+          ElevatedButton(
             onPressed: () {
-              Navigator.of(ctx).pop();
-              if (role == 'care_partner') {
+              Navigator.pop(ctx);
+              if (_selectedRole == 'caregiver') {
                 Navigator.pushReplacementNamed(context, AppRoutes.caregiverPortal);
               } else {
                 Navigator.pushReplacementNamed(context, AppRoutes.home);
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFF9933), // Saffron
+              foregroundColor: Colors.white,
+            ),
+            child: Text(loc?.translate('continue_button') ?? 'Continue', style: const TextStyle(fontSize: 18)),
           )
         ],
       ),
@@ -144,146 +143,181 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(loc.translate('signup_title')),
+        title: Text(loc?.translate('signup_title') ?? 'Create Account', style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: theme.colorScheme.primary),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (_errorMessage != null)
+      body: CulturalBackground(
+        imageAsset: 'lotus.png',
+        imageAlignment: Alignment.bottomCenter,
+        imageOpacity: 0.25,
+        imageWidth: 280,
+        imageHeight: 280,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 80),
+                TextField(
+                  controller: _nameController,
+                  style: const TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                    labelText: loc?.translate('full_name') ?? 'Full Name',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                    labelText: loc?.translate('email_label') ?? 'Email Address',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  style: const TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                    labelText: loc?.translate('password_label') ?? 'Password',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  style: const TextStyle(fontSize: 20),
+                  decoration: InputDecoration(
+                    labelText: loc?.translate('phone_optional') ?? 'Phone Number (Optional)',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                AccessibleText(
+                  loc?.translate('i_am_a') ?? 'I am a...',
+                  baseFontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 8),
+                SegmentedButton<String>(
+                  segments: [
+                    ButtonSegment(
+                        value: 'user',
+                        label: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Text(loc?.translate('role_user') ?? 'User', style: const TextStyle(fontSize: 18)),
+                        )
+                    ),
+                    ButtonSegment(
+                        value: 'caregiver',
+                        label: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Text(loc?.translate('role_caregiver') ?? 'Care Partner', style: const TextStyle(fontSize: 18)),
+                        )
+                    ),
+                  ],
+                  selected: {_selectedRole},
+                  onSelectionChanged: (Set<String> newSelection) {
+                    setState(() {
+                      _selectedRole = newSelection.first;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 24),
+                AccessibleText(
+                  loc?.translate('preferred_language') ?? 'Preferred Language',
+                  baseFontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.errorContainer,
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white.withValues(alpha: 0.9),
+                    border: Border.all(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: AccessibleText(
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedLanguage,
+                      isExpanded: true,
+                      style: const TextStyle(fontSize: 20, color: Colors.black87),
+                      items: _languages.map((lang) {
+                        return DropdownMenuItem<String>(
+                          value: lang['code'],
+                          child: Text(lang['name']!),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedLanguage = newValue;
+                          });
+                          widget.accessibilityController.changeLocale(newValue);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  AccessibleText(
                     _errorMessage!,
-                    color: theme.colorScheme.onErrorContainer,
-                  ),
-                ),
-
-              TextField(
-                controller: _nameController,
-                style: const TextStyle(fontSize: 20),
-                decoration: InputDecoration(
-                  labelText: loc.translate('full_name'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                  contentPadding: const EdgeInsets.all(20),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(fontSize: 20),
-                decoration: InputDecoration(
-                  labelText: loc.translate('email_label'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                  contentPadding: const EdgeInsets.all(20),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                style: const TextStyle(fontSize: 20),
-                decoration: InputDecoration(
-                  labelText: loc.translate('password_label'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                  contentPadding: const EdgeInsets.all(20),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                style: const TextStyle(fontSize: 20),
-                decoration: InputDecoration(
-                  labelText: loc.translate('phone_optional'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                  contentPadding: const EdgeInsets.all(20),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              AccessibleText(loc.translate('i_am_a'), baseFontSize: 20, fontWeight: FontWeight.bold),
-              const SizedBox(height: 12),
-              SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(
-                    value: 'user',
-                    label: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(loc.translate('role_user'), style: const TextStyle(fontSize: 18)),
-                    ),
-                  ),
-                  ButtonSegment(
-                    value: 'care_partner',
-                    label: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(loc.translate('role_caregiver'), style: const TextStyle(fontSize: 18)),
-                    ),
+                    color: Colors.red.shade800,
+                    baseFontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    textAlign: TextAlign.center,
                   ),
                 ],
-                selected: {_selectedRole},
-                onSelectionChanged: (Set<String> newSelection) {
-                  setState(() {
-                    _selectedRole = newSelection.first;
-                  });
-                },
-              ),
-              const SizedBox(height: 30),
+                const SizedBox(height: 32),
 
-              AccessibleText(loc.translate('preferred_language'), baseFontSize: 20, fontWeight: FontWeight.bold),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: theme.colorScheme.outline),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedLanguage,
-                    isExpanded: true,
-                    iconSize: 32,
-                    style: TextStyle(fontSize: 20, color: theme.colorScheme.onSurface),
-                    items: _languages.map((lang) {
-                      return DropdownMenuItem<String>(
-                        value: lang['code'],
-                        child: Text(lang['name']!),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          _selectedLanguage = newValue;
-                        });
-                      }
-                    },
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                  onPressed: _handleSignup,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF9933), // Indian Saffron
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 4,
+                  ),
+                  child: Text(
+                    loc?.translate('signup_button') ?? 'Sign Up',
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
-
-              if (_isLoading)
-                const Center(child: CircularProgressIndicator(strokeWidth: 4))
-              else
-                AccessibleButton(
-                  label: loc.translate('signup_button'),
-                  onPressed: _handleSignup,
-                  icon: Icons.person_add_rounded,
-                ),
-            ],
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),

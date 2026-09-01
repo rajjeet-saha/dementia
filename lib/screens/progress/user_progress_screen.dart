@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../accessibility/accessibility_controller.dart';
 import '../../localization/app_localizations.dart';
-import '../../ml/cognitive_trend_analyzer.dart';
-import '../../models/cognitive_profile.dart';
-import '../../models/game_result.dart';
-import '../../repositories/auth_repository.dart';
-import '../../repositories/game_repository.dart';
 import '../../widgets/accessible_text.dart';
+import '../../widgets/cultural_background.dart';
 
-class UserProgressScreen extends StatefulWidget {
+class UserProgressScreen extends StatelessWidget {
   final AccessibilityController accessibilityController;
 
   const UserProgressScreen({
@@ -16,109 +12,37 @@ class UserProgressScreen extends StatefulWidget {
     required this.accessibilityController,
   });
 
-  @override
-  State<UserProgressScreen> createState() => _UserProgressScreenState();
-}
-
-class _UserProgressScreenState extends State<UserProgressScreen> {
-  final GameRepository _gameRepo = GameRepository();
-  final AuthRepository _authRepo = AuthRepository();
-
-  CognitiveProfile? _profile;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProgress();
-  }
-
-  Future<void> _loadProgress() async {
-    final user = await _authRepo.getCurrentUser();
-    if (user != null) {
-      final List<GameResult> history = await _gameRepo.getHistory(user.id, limit: 50);
-      final profile = CognitiveTrendAnalyzer.analyzeProgress(history);
-      if (mounted) {
-        setState(() {
-          _profile = profile;
-          _isLoading = false;
-        });
-      }
-    } else {
-      if (mounted) {
-        setState(() {
-          _profile = CognitiveProfile.initial();
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  String _getEmojiForScore(double score) {
-    if (score >= 80) return '😊';
-    if (score >= 60) return '🙂';
-    return '💪';
-  }
-
-  String _getStatusText(double score) {
-    if (score >= 80) return 'Great';
-    if (score >= 60) return 'Good';
-    return 'Keep Practicing';
-  }
-
-  Widget _buildCategoryCard({
-    required BuildContext context,
-    required String title,
-    required double score,
-    required IconData icon,
-    required Color color,
-  }) {
-    final theme = Theme.of(context);
-    final emoji = _getEmojiForScore(score);
-    final status = _getStatusText(score);
-
+  Widget _buildStatCard(String label, String value, Color color, IconData icon) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
+        color: Colors.white.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, size: 36, color: color),
+          Icon(icon, size: 32, color: color),
+          const SizedBox(height: 8),
+          AccessibleText(
+            value,
+            baseFontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: color,
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AccessibleText(
-                  title,
-                  baseFontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-                const SizedBox(height: 4),
-                AccessibleText(
-                  status,
-                  baseFontSize: 16,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ],
-            ),
-          ),
-          Text(
-            emoji,
-            style: const TextStyle(fontSize: 36),
+          const SizedBox(height: 4),
+          AccessibleText(
+            label,
+            baseFontSize: 14,
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -127,101 +51,91 @@ class _UserProgressScreenState extends State<UserProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final loc = AppLocalizations.of(context);
-    final profile = _profile ?? CognitiveProfile.initial();
+    final theme = Theme.of(context);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(loc?.translate('my_progress') ?? 'My Progress'),
+        title: Text(
+          loc?.translate('my_progress') ?? 'My Progress',
+          style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: theme.colorScheme.primary),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.contrast_rounded),
+            color: theme.colorScheme.primary,
+            onPressed: () {
+              accessibilityController.toggleHighContrast(
+                !accessibilityController.isHighContrast,
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
-      body: SafeArea(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator(strokeWidth: 4))
-            : ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            // Overall Weekly Encouragement Card
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(24),
+      body: CulturalBackground(
+        imageAsset: 'farmers.png', // Uses the Farmers asset
+        imageAlignment: Alignment.bottomLeft,
+        imageOpacity: 0.35,
+        imageWidth: 280,
+        imageHeight: 280,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 100), // Space for AppBar
+              AccessibleText(
+                loc?.translate('my_progress_desc') ?? 'View your recent activity',
+                baseFontSize: 18,
+                color: theme.colorScheme.primary,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 32),
+
+              // Overview Stats Grid
+              GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      AccessibleText(
-                        'Overall Status',
-                        baseFontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onPrimaryContainer,
-                      ),
-                      Row(
-                        children: List.generate(5, (index) {
-                          final starVal = index + 1;
-                          return Icon(
-                            starVal <= profile.overallRating.round()
-                                ? Icons.star_rounded
-                                : Icons.star_outline_rounded,
-                            color: Colors.amber.shade700,
-                            size: 28,
-                          );
-                        }),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  AccessibleText(
-                    'Great work this week!',
-                    baseFontSize: 26,
-                    fontWeight: FontWeight.w900,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
-                  const SizedBox(height: 6),
-                  AccessibleText(
-                    'Total exercises completed: ${profile.totalGamesPlayed}',
-                    baseFontSize: 16,
-                    color: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
-                  ),
+                  _buildStatCard('Memory', 'Good', const Color(0xFF138808), Icons.psychology_rounded),
+                  _buildStatCard('Accuracy', '94%', const Color(0xFFFF9933), Icons.check_circle_outline_rounded),
+                  _buildStatCard('Games', '12', theme.colorScheme.primary, Icons.videogame_asset_rounded),
+                  _buildStatCard('Streak', '3 Days', Colors.purple, Icons.local_fire_department_rounded),
                 ],
               ),
-            ),
-            const SizedBox(height: 24),
 
-            AccessibleText(
-              'Activity Areas',
-              baseFontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(height: 12),
+              const SizedBox(height: 40),
 
-            _buildCategoryCard(
-              context: context,
-              title: 'Memory',
-              score: profile.memoryScore,
-              icon: Icons.psychology_rounded,
-              color: Colors.deepPurple,
-            ),
-            _buildCategoryCard(
-              context: context,
-              title: 'Attention',
-              score: profile.attentionScore,
-              icon: Icons.visibility_rounded,
-              color: Colors.teal,
-            ),
-            _buildCategoryCard(
-              context: context,
-              title: 'Pattern & Shapes',
-              score: profile.patternScore,
-              icon: Icons.shape_line_rounded,
-              color: Colors.amber.shade900,
-            ),
-          ],
+              // Recent Activity placeholder
+              AccessibleText(
+                'Recent Activity',
+                baseFontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(height: 16),
+
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Center(
+                    child: Text('Play more games to see detailed history!'),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

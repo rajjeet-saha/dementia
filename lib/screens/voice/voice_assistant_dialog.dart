@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../accessibility/accessibility_controller.dart';
 import '../../app/routes.dart';
+import '../../screens/games/game_play_screen.dart';
 import '../../voice/intent_detector.dart';
 import '../../voice/voice_assistant_service.dart';
 import '../../voice/voice_commands.dart';
@@ -8,11 +9,11 @@ import '../../widgets/accessible_button.dart';
 import '../../widgets/accessible_text.dart';
 
 class VoiceAssistantDialog extends StatefulWidget {
-  final AccessibilityController accessibilityController; // Must match exactly
+  final AccessibilityController accessibilityController;
 
   const VoiceAssistantDialog({
     super.key,
-    required this.accessibilityController, // Must match exactly
+    required this.accessibilityController,
   });
 
   @override
@@ -39,11 +40,12 @@ class _VoiceAssistantDialogState extends State<VoiceAssistantDialog> {
   }
 
   Future<void> _startVoiceInteraction() async {
+    // Let the voice service initialize and handle the native permission prompt automatically
     final hasPermission = await _voiceService.initialize();
 
     if (!hasPermission) {
       setState(() {
-        _spokenText = "Microphone permission denied.";
+        _spokenText = "Microphone permission or speech service unavailable.";
       });
       return;
     }
@@ -95,8 +97,17 @@ class _VoiceAssistantDialogState extends State<VoiceAssistantDialog> {
 
     switch (intent) {
       case VoiceIntent.openGames:
-        Navigator.pop(context);
-        Navigator.pushNamed(context, AppRoutes.games);
+        Navigator.pop(context); // Close voice dialog
+        // Launch directly into your multi-game sequence screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GamePlayScreen(
+              accessibilityController: widget.accessibilityController,
+              gameType: 'cognitive_2d',
+            ),
+          ),
+        );
         break;
       case VoiceIntent.openReminders:
         Navigator.pop(context);
@@ -140,7 +151,6 @@ class _VoiceAssistantDialogState extends State<VoiceAssistantDialog> {
             ),
           ),
           const SizedBox(height: 24),
-
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -157,18 +167,14 @@ class _VoiceAssistantDialogState extends State<VoiceAssistantDialog> {
                   : theme.colorScheme.onSurfaceVariant,
             ),
           ),
-
           const SizedBox(height: 24),
-
           AccessibleText(
             _spokenText,
             baseFontSize: 24,
             fontWeight: FontWeight.bold,
             textAlign: TextAlign.center,
           ),
-
           const SizedBox(height: 32),
-
           if (!_isProcessing)
             AccessibleButton(
               label: _isListening ? 'Stop' : 'Try Again',
@@ -181,9 +187,7 @@ class _VoiceAssistantDialogState extends State<VoiceAssistantDialog> {
               },
               isPrimary: !_isListening,
             ),
-
           const SizedBox(height: 12),
-
           AccessibleButton(
             label: 'Close',
             onPressed: () => Navigator.pop(context),
